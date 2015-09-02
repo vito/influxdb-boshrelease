@@ -30,11 +30,13 @@
 # Trim the leading spaces when creating the file. The script will exit if
 # S3 upload is requested, but this file does not exist.
 
+[ -z $DEBUG ] || set -x
+
 AWS_FILE=~/aws.conf
 
 INSTALL_ROOT_DIR=/opt/influxdb
-INFLUXDB_RUN_DIR=/var/opt/influxdb
 INFLUXDB_LOG_DIR=/var/log/influxdb
+INFLUXDB_DATA_DIR=/var/opt/influxdb
 CONFIG_ROOT_DIR=/etc/opt/influxdb
 
 SAMPLE_CONFIGURATION=etc/config.sample.toml
@@ -49,6 +51,14 @@ MAINTAINER=support@influxdb.com
 VENDOR=Influxdb
 DESCRIPTION="Distributed time-series database"
 
+# Allow path to FPM to be set by environment variables. Some execution contexts
+# like cron don't have PATH set correctly to pick it up.
+if [ -z "$FPM" ]; then
+    FPM=`which fpm`
+fi
+
+GO_VERSION="go1.5"
+GOPATH_INSTALL=
 BINS=(
     influxd
     influx
@@ -71,11 +81,42 @@ cleanup_exit() {
     exit $1
 }
 
-# check_gopath sanity checks the value of the GOPATH env variable.
+# current_branch echos the current git branch.
+current_branch() {
+    echo `git rev-parse --abbrev-ref HEAD`
+}
+
+# check_gopath sanity checks the value of the GOPATH env variable, and determines
+# the path where build artifacts are installed. GOPATH may be a colon-delimited
+# list of directories.
 check_gopath() {
     [ -z "$GOPATH" ] && echo "GOPATH is not set." && cleanup_exit 1
-    [ ! -d "$GOPATH" ] && echo "GOPATH is not a directory." && cleanup_exit 1
-    echo "GOPATH ($GOPATH) looks sane."
+    GOPATH_INSTALL=`echo $GOPATH | cut -d ':' -f 1`
+    [ ! -d "$GOPATH_INSTALL" ] && echo "GOPATH_INSTALL is not a directory." && cleanup_exit 1
+    echo "GOPATH ($GOPATH) looks sane, using $GOPATH_INSTALL for installation."
+}
+
+check_gvm() {
+    if [ -n "$GOPATH" ]; then
+        existing_gopath=$GOPATH
+    fi
+
+    source $HOME/.gvm/scripts/gvm
+    which gvm
+    if [ $? -ne 0 ]; then
+        echo "gvm not found -- aborting."
+        cleanup_exit $1
+    fi
+    gvm use $GO_VERSION
+    if [ $? -ne 0 ]; then
+        echo "gvm cannot find Go version $GO_VERSION -- aborting."
+        cleanup_exit $1
+    fi
+
+    # Keep any existing GOPATH set.
+    if [ -n "$existing_gopath" ]; then
+        GOPATH=$existing_gopath
+    fi
 }
 
 # check_clean_tree ensures that no source file is locally modified.
@@ -90,7 +131,7 @@ check_clean_tree() {
 
 # update_tree ensures the tree is in-sync with the repo.
 update_tree() {
-    git pull origin master
+    git pull origin $TARGET_BRANCH
     if [ $? -ne 0 ]; then
         echo "Failed to pull latest code -- aborting."
         cleanup_exit 1
@@ -132,21 +173,24 @@ make_dir_tree() {
 
 # do_build builds the code. The version and commit must be passed in.
 do_build() {
+    for b in ${BINS[*]}; do
+        rm -f $GOPATH_INSTALL/bin/$b
+    done
+    go get -u -f -d ./...
+    if [ $? -ne 0 ]; then
+        echo "WARNING: failed to 'go get' packages."
+    fi
+
+    git checkout $TARGET_BRANCH # go get switches to master, so ensure we're back.
     version=$1
     commit=`git rev-parse HEAD`
+    branch=`current_branch`
     if [ $? -ne 0 ]; then
         echo "Unable to retrieve current commit -- aborting"
         cleanup_exit 1
     fi
 
-    for b in ${BINS[*]}; do
-        rm -f $GOPATH/bin/$b
-    done
-    go get -u -f ./...
-    if [ $? -ne 0 ]; then
-        echo "WARNING: failed to 'go get' packages."
-    fi
-    go install -a -ldflags="-X main.version $version -X main.commit $commit" ./...
+    go install -a -ldflags="-X main.version=$version -X main.branch=$branch -X main.commit=$commit" ./...
     if [ $? -ne 0 ]; then
         echo "Build failed, unable to create package -- aborting"
         cleanup_exit 1
@@ -182,10 +226,10 @@ fi
 chown -R -L influxdb:influxdb $INSTALL_ROOT_DIR
 chmod -R a+rX $INSTALL_ROOT_DIR
 
-mkdir -p $INFLUXDB_RUN_DIR
-chown -R -L influxdb:influxdb $INFLUXDB_RUN_DIR
 mkdir -p $INFLUXDB_LOG_DIR
 chown -R -L influxdb:influxdb $INFLUXDB_LOG_DIR
+mkdir -p $INFLUXDB_DATA_DIR
+chown -R -L influxdb:influxdb $INFLUXDB_DATA_DIR
 EOF
     echo "Post-install script created successfully at $POST_INSTALL_PATH"
 }
@@ -199,14 +243,31 @@ elif [ $1 == "-h" ]; then
     usage 0
 else
     VERSION=$1
+    VERSION_UNDERSCORED=`echo "$VERSION" | tr - _`
 fi
 
 echo -e "\nStarting package process...\n"
 
+# Ensure the current is correct.
+TARGET_BRANCH=`current_branch`
+if [ -z "$NIGHTLY_BUILD" ]; then
+echo -n "Current branch is $TARGET_BRANCH. Start packaging this branch? [Y/n] "
+    read response
+    response=`echo $response | tr 'A-Z' 'a-z'`
+    if [ "x$response" == "xn" ]; then
+        echo "Packaging aborted."
+        cleanup_exit 1
+    fi
+fi
+
+check_gvm
 check_gopath
-check_clean_tree
-update_tree
-check_tag_exists $VERSION
+if [ -z "$NIGHTLY_BUILD" ]; then
+       check_clean_tree
+       update_tree
+       check_tag_exists $VERSION
+fi
+
 do_build $VERSION
 make_dir_tree $TMP_WORK_DIR $VERSION
 
@@ -214,7 +275,7 @@ make_dir_tree $TMP_WORK_DIR $VERSION
 # Copy the assets to the installation directories.
 
 for b in ${BINS[*]}; do
-    cp $GOPATH/bin/$b $TMP_WORK_DIR/$INSTALL_ROOT_DIR/versions/$VERSION
+    cp $GOPATH_INSTALL/bin/$b $TMP_WORK_DIR/$INSTALL_ROOT_DIR/versions/$VERSION
     if [ $? -ne 0 ]; then
         echo "Failed to copy binaries to packaging directory -- aborting."
         cleanup_exit 1
@@ -240,90 +301,99 @@ generate_postinstall_script $VERSION
 ###########################################################################
 # Create the actual packages.
 
-echo -n "Commence creation of $ARCH packages, version $VERSION? [Y/n] "
-read response
-response=`echo $response | tr 'A-Z' 'a-z'`
-if [ "x$response" == "xn" ]; then
-    echo "Packaging aborted."
-    cleanup_exit 1
+if [ -z "$NIGHTLY_BUILD" ]; then
+    echo -n "Commence creation of $ARCH packages, version $VERSION? [Y/n] "
+    read response
+    response=`echo $response | tr 'A-Z' 'a-z'`
+    if [ "x$response" == "xn" ]; then
+        echo "Packaging aborted."
+        cleanup_exit 1
+    fi
 fi
 
 if [ $ARCH == "i386" ]; then
-    rpm_package=influxdb-$VERSION-1.i686.rpm
+    rpm_package=influxdb-${VERSION}-1.i686.rpm # RPM packages use 1 for default package release.
     debian_package=influxdb_${VERSION}_i686.deb
     deb_args="-a i686"
     rpm_args="setarch i686"
 elif [ $ARCH == "arm" ]; then
-    rpm_package=influxdb-$VERSION-1.armel.rpm
+    rpm_package=influxdb-${VERSION}-1.armel.rpm
     debian_package=influxdb_${VERSION}_armel.deb
 else
-    rpm_package=influxdb-$VERSION-1.x86_64.rpm
+    rpm_package=influxdb-${VERSION}-1.x86_64.rpm
     debian_package=influxdb_${VERSION}_amd64.deb
 fi
 
 COMMON_FPM_ARGS="-C $TMP_WORK_DIR --vendor $VENDOR --url $URL --license $LICENSE --maintainer $MAINTAINER --after-install $POST_INSTALL_PATH --name influxdb --version $VERSION --config-files $CONFIG_ROOT_DIR ."
-$rpm_args fpm -s dir -t rpm --description "$DESCRIPTION" $COMMON_FPM_ARGS
-if [ $? -ne 0 ]; then
-    echo "Failed to create RPM package -- aborting."
-    cleanup_exit 1
-fi
-echo "RPM package created successfully."
 
-fpm -s dir -t deb $deb_args --description "$DESCRIPTION" $COMMON_FPM_ARGS
+$FPM -s dir -t deb $deb_args --description "$DESCRIPTION" $COMMON_FPM_ARGS
 if [ $? -ne 0 ]; then
     echo "Failed to create Debian package -- aborting."
     cleanup_exit 1
 fi
 echo "Debian package created successfully."
 
+$FPM -s dir -t tar --prefix influxdb_${VERSION}_${ARCH} -p influxdb_${VERSION}_${ARCH}.tar.gz --description "$DESCRIPTION" $COMMON_FPM_ARGS
+if [ $? -ne 0 ]; then
+    echo "Failed to create Tar package -- aborting."
+    cleanup_exit 1
+fi
+echo "Tar package created successfully."
+
+$rpm_args $FPM -s dir -t rpm --description "$DESCRIPTION" $COMMON_FPM_ARGS
+if [ $? -ne 0 ]; then
+    echo "Failed to create RPM package -- aborting."
+    cleanup_exit 1
+fi
+echo "RPM package created successfully."
+
 ###########################################################################
 # Offer to tag the repo.
 
-echo -n "Tag source tree with v$VERSION and push to repo? [y/N] "
-read response
-response=`echo $response | tr 'A-Z' 'a-z'`
-if [ "x$response" == "xy" ]; then
-    echo "Creating tag v$VERSION and pushing to repo"
-    git tag v$VERSION
-    if [ $? -ne 0 ]; then
-        echo "Failed to create tag v$VERSION -- aborting"
-        cleanup_exit 1
+if [ -z "$NIGHTLY_BUILD" ]; then
+    echo -n "Tag source tree with v$VERSION and push to repo? [y/N] "
+    read response
+    response=`echo $response | tr 'A-Z' 'a-z'`
+    if [ "x$response" == "xy" ]; then
+        echo "Creating tag v$VERSION and pushing to repo"
+        git tag v$VERSION
+        if [ $? -ne 0 ]; then
+            echo "Failed to create tag v$VERSION -- aborting"
+            cleanup_exit 1
+        fi
+        git push origin v$VERSION
+        if [ $? -ne 0 ]; then
+            echo "Failed to push tag v$VERSION to repo -- aborting"
+            cleanup_exit 1
+        fi
+    else
+        echo "Not creating tag v$VERSION."
     fi
-    git push origin v$VERSION
-    if [ $? -ne 0 ]; then
-        echo "Failed to push tag v$VERSION to repo -- aborting"
-        cleanup_exit 1
-    fi
-else
-    echo "Not creating tag v$VERSION."
 fi
-
 
 ###########################################################################
 # Offer to publish the packages.
 
-echo -n "Publish packages to S3? [y/N] "
-read response
-response=`echo $response | tr 'A-Z' 'a-z'`
-if [ "x$response" == "xy" ]; then
+if [ -z "$NIGHTLY_BUILD" ]; then
+    echo -n "Publish packages to S3? [y/N] "
+    read response
+    response=`echo $response | tr 'A-Z' 'a-z'`
+fi
+
+if [ "x$response" == "xy" -o -n "$NIGHTLY_BUILD" ]; then
     echo "Publishing packages to S3."
     if [ ! -e "$AWS_FILE" ]; then
         echo "$AWS_FILE does not exist -- aborting."
         cleanup_exit 1
     fi
 
-    for filepath in `ls *.{deb,rpm}`; do
-        echo "Uploading $filepath to S3"
+    for filepath in `ls *.{deb,rpm,gz}`; do
         filename=`basename $filepath`
-        bucket=influxdb
-        echo "Uploading $filename to s3://influxdb/$filename"
-        AWS_CONFIG_FILE=$AWS_FILE aws s3 cp $filepath s3://influxdb/$filename --acl public-read --region us-east-1
-        if [ $? -ne 0 ]; then
-            echo "Upload failed -- aborting".
-            cleanup_exit 1
+        if [ -n "$NIGHTLY_BUILD" ]; then
+            filename=`echo $filename | sed s/$VERSION/nightly/`
+            filename=`echo $filename | sed s/$VERSION_UNDERSCORED/nightly/`
         fi
-        echo "Uploading $filename to s3://get.influxdb.org/$filename"
-        AWS_CONFIG_FILE=$AWS_FILE aws s3 cp $filepath s3://get.influxdb.org/$filename --acl public-read --region us-east-1
+        AWS_CONFIG_FILE=$AWS_FILE aws s3 cp $filepath s3://influxdb/$filename --acl public-read --region us-east-1
         if [ $? -ne 0 ]; then
             echo "Upload failed -- aborting".
             cleanup_exit 1

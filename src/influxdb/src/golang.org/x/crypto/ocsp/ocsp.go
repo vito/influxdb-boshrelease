@@ -49,7 +49,7 @@ type ocspRequest struct {
 }
 
 type tbsRequest struct {
-	Version       int              `asn1:"explicit,tag:0,default:0"`
+	Version       int              `asn1:"explicit,tag:0,default:0,optional"`
 	RequestorName pkix.RDNSequence `asn1:"explicit,tag:1,optional"`
 	RequestList   []request
 }
@@ -76,26 +76,26 @@ type basicResponse struct {
 }
 
 type responseData struct {
-	Raw           asn1.RawContent
-	Version       int              `asn1:"optional,default:1,explicit,tag:0"`
-	ResponderName pkix.RDNSequence `asn1:"optional,explicit,tag:1"`
-	KeyHash       []byte           `asn1:"optional,explicit,tag:2"`
-	ProducedAt    time.Time
-	Responses     []singleResponse
+	Raw              asn1.RawContent
+	Version          int           `asn1:"optional,default:1,explicit,tag:0"`
+	RawResponderName asn1.RawValue `asn1:"optional,explicit,tag:1"`
+	KeyHash          []byte        `asn1:"optional,explicit,tag:2"`
+	ProducedAt       time.Time     `asn1:"generalized"`
+	Responses        []singleResponse
 }
 
 type singleResponse struct {
 	CertID     certID
-	Good       asn1.Flag   `asn1:"explicit,tag:0,optional"`
-	Revoked    revokedInfo `asn1:"explicit,tag:1,optional"`
-	Unknown    asn1.Flag   `asn1:"explicit,tag:2,optional"`
-	ThisUpdate time.Time
-	NextUpdate time.Time `asn1:"explicit,tag:0,optional"`
+	Good       asn1.Flag   `asn1:"tag:0,optional"`
+	Revoked    revokedInfo `asn1:"tag:1,optional"`
+	Unknown    asn1.Flag   `asn1:"tag:2,optional"`
+	ThisUpdate time.Time   `asn1:"generalized"`
+	NextUpdate time.Time   `asn1:"generalized,explicit,tag:0,optional"`
 }
 
 type revokedInfo struct {
-	RevocationTime time.Time
-	Reason         int `asn1:"explicit,tag:0,optional"`
+	RevocationTime time.Time       `asn1:"generalized"`
+	Reason         asn1.Enumerated `asn1:"explicit,tag:0,optional"`
 }
 
 var (
@@ -230,6 +230,7 @@ func getHashAlgorithmFromOID(target asn1.ObjectIdentifier) crypto.Hash {
 
 // This is the exposed reflection of the internal OCSP structures.
 
+// The status values that can be expressed in OCSP.  See RFC 6960.
 const (
 	// Good means that the certificate is valid.
 	Good = iota
@@ -239,6 +240,21 @@ const (
 	Unknown = iota
 	// ServerFailed means that the OCSP responder failed to process the request.
 	ServerFailed = iota
+)
+
+// The enumerated reasons for revoking a certificate.  See RFC 5280.
+const (
+	Unspecified          = iota
+	KeyCompromise        = iota
+	CACompromise         = iota
+	AffiliationChanged   = iota
+	Superseded           = iota
+	CessationOfOperation = iota
+	CertificateHold      = iota
+	_                    = iota
+	RemoveFromCRL        = iota
+	PrivilegeWithdrawn   = iota
+	AACompromise         = iota
 )
 
 // Request represents an OCSP request. See RFC 2560.
@@ -263,6 +279,18 @@ type Response struct {
 	Signature          []byte
 	SignatureAlgorithm x509.SignatureAlgorithm
 }
+
+// These are pre-serialized error responses for the various non-success codes
+// defined by OCSP. The Unauthorized code in particular can be used by an OCSP
+// responder that supports only pre-signed responses as a response to requests
+// for certificates with unknown status. See RFC 5019.
+var (
+	MalformedRequestErrorResponse = []byte{0x30, 0x03, 0x0A, 0x01, 0x01}
+	InternalErrorErrorResponse    = []byte{0x30, 0x03, 0x0A, 0x01, 0x02}
+	TryLaterErrorResponse         = []byte{0x30, 0x03, 0x0A, 0x01, 0x03}
+	SigRequredErrorResponse       = []byte{0x30, 0x03, 0x0A, 0x01, 0x05}
+	UnauthorizedErrorResponse     = []byte{0x30, 0x03, 0x0A, 0x01, 0x06}
+)
 
 // CheckSignatureFrom checks that the signature in resp is a valid signature
 // from issuer. This should only be used if resp.Certificate is nil. Otherwise,
@@ -387,7 +415,7 @@ func ParseResponse(bytes []byte, issuer *x509.Certificate) (*Response, error) {
 	default:
 		ret.Status = Revoked
 		ret.RevokedAt = r.Revoked.RevocationTime
-		ret.RevocationReason = r.Revoked.Reason
+		ret.RevocationReason = int(r.Revoked.Reason)
 	}
 
 	ret.ProducedAt = basicResp.TBSResponseData.ProducedAt
@@ -517,15 +545,22 @@ func CreateResponse(issuer, responderCert *x509.Certificate, template Response, 
 		innerResponse.Unknown = true
 	case Revoked:
 		innerResponse.Revoked = revokedInfo{
-			RevocationTime: template.RevokedAt,
-			Reason:         template.RevocationReason,
+			RevocationTime: template.RevokedAt.UTC(),
+			Reason:         asn1.Enumerated(template.RevocationReason),
 		}
 	}
 
+	responderName := asn1.RawValue{
+		Class:      2, // context-specific
+		Tag:        1, // explicit tag
+		IsCompound: true,
+		Bytes:      responderCert.RawSubject,
+	}
 	tbsResponseData := responseData{
-		ResponderName: responderCert.Subject.ToRDNSequence(),
-		ProducedAt:    time.Now().Truncate(time.Minute),
-		Responses:     []singleResponse{innerResponse},
+		Version:          0,
+		RawResponderName: responderName,
+		ProducedAt:       time.Now().Truncate(time.Minute).UTC(),
+		Responses:        []singleResponse{innerResponse},
 	}
 
 	tbsResponseDataDER, err := asn1.Marshal(tbsResponseData)

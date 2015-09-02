@@ -68,14 +68,17 @@ const (
 	DEFAULT
 	DELETE
 	DESC
+	DISTINCT
 	DROP
 	DURATION
 	END
 	EXISTS
 	EXPLAIN
 	FIELD
+	FOR
 	FROM
 	GRANT
+	GRANTS
 	GROUP
 	IF
 	IN
@@ -88,6 +91,7 @@ const (
 	LIMIT
 	MEASUREMENT
 	MEASUREMENTS
+	NOT
 	OFFSET
 	ON
 	ORDER
@@ -104,9 +108,11 @@ const (
 	SELECT
 	SERIES
 	SERVERS
+	SET
 	SHOW
 	SLIMIT
 	STATS
+	DIAGNOSTICS
 	SOFFSET
 	TAG
 	TO
@@ -171,13 +177,16 @@ var tokens = [...]string{
 	DELETE:       "DELETE",
 	DESC:         "DESC",
 	DROP:         "DROP",
+	DISTINCT:     "DISTINCT",
 	DURATION:     "DURATION",
 	END:          "END",
 	EXISTS:       "EXISTS",
 	EXPLAIN:      "EXPLAIN",
 	FIELD:        "FIELD",
+	FOR:          "FOR",
 	FROM:         "FROM",
 	GRANT:        "GRANT",
+	GRANTS:       "GRANTS",
 	GROUP:        "GROUP",
 	IF:           "IF",
 	IN:           "IN",
@@ -190,6 +199,7 @@ var tokens = [...]string{
 	LIMIT:        "LIMIT",
 	MEASUREMENT:  "MEASUREMENT",
 	MEASUREMENTS: "MEASUREMENTS",
+	NOT:          "NOT",
 	OFFSET:       "OFFSET",
 	ON:           "ON",
 	ORDER:        "ORDER",
@@ -206,10 +216,12 @@ var tokens = [...]string{
 	SELECT:       "SELECT",
 	SERIES:       "SERIES",
 	SERVERS:      "SERVERS",
+	SET:          "SET",
 	SHOW:         "SHOW",
 	SLIMIT:       "SLIMIT",
 	SOFFSET:      "SOFFSET",
 	STATS:        "STATS",
+	DIAGNOSTICS:  "DIAGNOSTICS",
 	TAG:          "TAG",
 	TO:           "TO",
 	USER:         "USER",
@@ -225,11 +237,9 @@ var keywords map[string]Token
 func init() {
 	keywords = make(map[string]Token)
 	for tok := keyword_beg + 1; tok < keyword_end; tok++ {
-		keywords[strings.ToUpper(tokens[tok])] = tok
 		keywords[strings.ToLower(tokens[tok])] = tok
 	}
 	for _, tok := range []Token{AND, OR} {
-		keywords[strings.ToUpper(tokens[tok])] = tok
 		keywords[strings.ToLower(tokens[tok])] = tok
 	}
 	keywords["true"] = TRUE
@@ -274,7 +284,7 @@ func tokstr(tok Token, lit string) string {
 
 // Lookup returns the token associated with a given string.
 func Lookup(ident string) Token {
-	if tok, ok := keywords[ident]; ok {
+	if tok, ok := keywords[strings.ToLower(ident)]; ok {
 		return tok
 	}
 	return IDENT

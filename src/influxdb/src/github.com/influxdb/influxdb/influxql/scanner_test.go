@@ -55,14 +55,17 @@ func TestScanner_Scan(t *testing.T) {
 		{s: `,`, tok: influxql.COMMA},
 		{s: `;`, tok: influxql.SEMICOLON},
 		{s: `.`, tok: influxql.DOT},
+		{s: `=~`, tok: influxql.EQREGEX},
+		{s: `!~`, tok: influxql.NEQREGEX},
 
 		// Identifiers
 		{s: `foo`, tok: influxql.IDENT, lit: `foo`},
+		{s: `_foo`, tok: influxql.IDENT, lit: `_foo`},
 		{s: `Zx12_3U_-`, tok: influxql.IDENT, lit: `Zx12_3U_`},
-		{s: `"foo".bar`, tok: influxql.IDENT, lit: `"foo".bar`},
-		{s: `"foo\\bar"`, tok: influxql.IDENT, lit: `"foo\bar"`},
+		{s: `"foo"`, tok: influxql.IDENT, lit: `foo`},
+		{s: `"foo\\bar"`, tok: influxql.IDENT, lit: `foo\bar`},
 		{s: `"foo\bar"`, tok: influxql.BADESCAPE, lit: `\b`, pos: influxql.Pos{Line: 0, Char: 5}},
-		{s: `"foo\"bar\""`, tok: influxql.IDENT, lit: `"foo"bar""`},
+		{s: `"foo\"bar\""`, tok: influxql.IDENT, lit: `foo"bar"`},
 		{s: `test"`, tok: influxql.BADSTRING, lit: "", pos: influxql.Pos{Line: 0, Char: 3}},
 		{s: `"test`, tok: influxql.BADSTRING, lit: `test`},
 
@@ -135,6 +138,7 @@ func TestScanner_Scan(t *testing.T) {
 		{s: `SHOW`, tok: influxql.SHOW},
 		{s: `MEASUREMENT`, tok: influxql.MEASUREMENT},
 		{s: `MEASUREMENTS`, tok: influxql.MEASUREMENTS},
+		{s: `NOT`, tok: influxql.NOT},
 		{s: `OFFSET`, tok: influxql.OFFSET},
 		{s: `ON`, tok: influxql.ON},
 		{s: `ORDER`, tok: influxql.ORDER},
@@ -158,6 +162,7 @@ func TestScanner_Scan(t *testing.T) {
 		{s: `WITH`, tok: influxql.WITH},
 		{s: `WRITE`, tok: influxql.WRITE},
 		{s: `explain`, tok: influxql.EXPLAIN}, // case insensitive
+		{s: `seLECT`, tok: influxql.SELECT},   // case insensitive
 	}
 
 	for i, tt := range tests {
@@ -239,6 +244,7 @@ func TestScanString(t *testing.T) {
 		{in: `"foo\nbar"`, out: "foo\nbar"},
 		{in: `"foo\\bar"`, out: `foo\bar`},
 		{in: `"foo\"bar"`, out: `foo"bar`},
+		{in: `'foo\'bar'`, out: `foo'bar`},
 
 		{in: `"foo` + "\n", out: `foo`, err: "bad string"}, // newline in string
 		{in: `"foo`, out: `foo`, err: "bad string"},        // unclosed quotes
@@ -255,35 +261,28 @@ func TestScanString(t *testing.T) {
 	}
 }
 
-// Ensure identifiers can be split into multiple quoted and unquoted parts.
-func TestSplitIdent(t *testing.T) {
+// Test scanning regex
+func TestScanRegex(t *testing.T) {
 	var tests = []struct {
 		in  string
-		out []string
+		tok influxql.Token
+		lit string
 		err string
 	}{
-		{in: `"db"."rp"."measurement"`, out: []string{`db`, `rp`, `measurement`}},
-		{in: `"db"."rp".measurement`, out: []string{`db`, `rp`, `measurement`}},
-		{in: `cpu.load.total`, out: []string{`cpu.load.total`}},
-		{in: `"rp".cpu.load.total`, out: []string{`rp`, `cpu.load.total`}},
-		{in: `"db"..cpu.load.total`, out: []string{`db`, ``, `cpu.load.total`}},
-		{in: `db."rp".cpu.total`, out: []string{`db`, `rp`, `cpu.total`}},
-		{in: `db...cpu`, out: []string{`db`, ``, ``, `cpu`}},
-		{in: `"db.rp".cpu`, out: []string{`db.rp`, `cpu`}},
-
-		{in: ``, err: "invalid identifier"},
-		{in: `.`, err: "invalid identifier"},
-		{in: `.cpu`, err: "invalid identifier"},
-		{in: `db.`, err: "invalid identifier"},
-		{in: `hello world`, err: "invalid identifier"},
+		{in: `/^payments\./`, tok: influxql.REGEX, lit: `^payments\.`},
+		{in: `/foo\/bar/`, tok: influxql.REGEX, lit: `foo/bar`},
+		{in: `/foo\\/bar/`, tok: influxql.REGEX, lit: `foo\/bar`},
+		{in: `/foo\\bar/`, tok: influxql.REGEX, lit: `foo\\bar`},
 	}
 
 	for i, tt := range tests {
-		out, err := influxql.SplitIdent(tt.in)
-		if tt.err != errstring(err) {
-			t.Errorf("%d. %s: error: exp=%s, got=%s", i, tt.in, tt.err, err)
-		} else if !reflect.DeepEqual(tt.out, out) {
-			t.Errorf("%d. %s: out: exp=%s, got=%s", i, tt.in, tt.out, out)
+		s := influxql.NewScanner(strings.NewReader(tt.in))
+		tok, _, lit := s.ScanRegex()
+		if tok != tt.tok {
+			t.Errorf("%d. %s: error:\n\texp=%s\n\tgot=%s\n", i, tt.in, tt.tok.String(), tok.String())
+		}
+		if lit != tt.lit {
+			t.Errorf("%d. %s: error:\n\texp=%s\n\tgot=%s\n", i, tt.in, tt.lit, lit)
 		}
 	}
 }

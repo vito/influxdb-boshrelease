@@ -9,8 +9,6 @@ packages:
 - bootstrapper
 
 properties:
-  influxdb.ips:
-    description: "an array of the ips for influxdb"
   influxdb.database:
     description: "database name in influxdb to create"
   influxdb.user:

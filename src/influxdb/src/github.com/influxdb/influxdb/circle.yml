@@ -1,10 +1,18 @@
-dependencies:
+machine:
+    services:
+        - docker
     pre:
-        - go get -u golang.org/x/tools/cmd/vet;
+        - bash < <(curl -s -S -L https://raw.githubusercontent.com/moovweb/gvm/master/binscripts/gvm-installer)
+        - source $HOME/.gvm/scripts/gvm; gvm install go1.5 --binary
 
-
+dependencies:
+    override:
+        - if [[ -e ~/docker/image.tar ]]; then docker load -i ~/docker/image.tar; fi
+        - docker build -f Dockerfile_test_ubuntu32 -t ubuntu-32-influxdb-test .
+        - mkdir -p ~/docker; docker save ubuntu-32-influxdb-test > ~/docker/image.tar
+    cache_directories:
+        - "~/docker"
 test:
     override:
-    # Put each test command on its own line.
-        - go test -timeout 60s -v ./...
-        - go tool vet .
+        - bash circle-test.sh:
+            parallel: true

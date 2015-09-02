@@ -2,8 +2,7 @@
 
 ## An Open-Source, Distributed, Time Series Database
 
-> InfluxDB v0.9.0 is now in the RC phase. If you're building a new project,
-> please build against `master` or the most current RC instead of using v0.8.8.
+> InfluxDB v0.9.0 is now out. Going forward, the 0.9.x series of releases will not make breaking API changes or breaking changes to the underlying data storage. However, 0.9.0 clustering should be considered an alpha release.
 
 InfluxDB is an open source **distributed time series database** with
 **no external dependencies**. It's useful for recording metrics,
@@ -11,7 +10,9 @@ events, and performing analytics.
 
 ## Features
 
-* Built-in [HTTP API] (http://influxdb.com/docs/v0.9/concepts/reading_and_writing_data.html) so you don't have to write any server side code to get up and running.
+* Built-in [HTTP API](http://influxdb.com/docs/v0.9/concepts/reading_and_writing_data.html) so you don't have to write any server side code to get up and running.
+* Data can be tagged, allowing very flexible querying.
+* SQL-like query language.
 * Clustering is supported out of the box, so that you can scale horizontally to handle your data.
 * Simple to install and manage, and fast to get data in and out.
 * It aims to answer queries in real-time. That means every data point is
@@ -24,7 +25,7 @@ events, and performing analytics.
 ### Building
 
 You don't need to build the project to use it - you can use any of our
-[pre-built packages](http://influxdb.com/download/) to install InfluxDB. That's
+[pre-built packages](http://influxdb.com/download/index.html) to install InfluxDB. That's
 the recommended way to get it running. However, if you want to contribute to the core of InfluxDB, you'll need to build.
 For those adventurous enough, you can
 [follow along on our docs](http://github.com/influxdb/influxdb/blob/master/CONTRIBUTING.md).
@@ -35,40 +36,36 @@ For those adventurous enough, you can
 
 ### Creating your first database
 
-```JSON
-curl -G 'http://localhost:8086/query' \
---data-urlencode "q=CREATE DATABASE mydb"
+```
+curl -G 'http://localhost:8086/query' --data-urlencode "q=CREATE DATABASE mydb"
 ```
 
 ### Insert some data
-```JSON
-curl -H "Content-Type: application/json" http://localhost:8086/write -d '
-{
-    "database": "mydb",
-    "retentionPolicy": "default",
-    "points": [
-        {
-            "timestamp": "2014-11-10T23:00:00Z",
-            "name": "cpu",
-             "tags": {
-                 "region":"uswest",
-                 "host": "server01"
-            },
-             "fields":{
-                 "value": 100
-            }
-         }
-      ]
-}'
 ```
+curl -XPOST 'http://localhost:8086/write?db=mydb' \
+-d 'cpu,host=server01,region=uswest load=42 1434055562000000000'
+
+curl -XPOST 'http://localhost:8086/write?db=mydb' \
+-d 'cpu,host=server02,region=uswest load=78 1434055562000000000'
+
+curl -XPOST 'http://localhost:8086/write?db=mydb' \
+-d 'cpu,host=server03,region=useast load=15.4 1434055562000000000'
+```
+
 ### Query for the data
 ```JSON
-curl -G http://localhost:8086/query?pretty=true \
---data-urlencode "db=mydb" --data-urlencode "q=SELECT * FROM cpu"
+curl -G http://localhost:8086/query?pretty=true --data-urlencode "db=mydb" \
+--data-urlencode "q=SELECT * FROM cpu WHERE host='server01' AND time < now - 1d"
 ```
+
+### Analyze the data
+```JSON
+curl -G http://localhost:8086/query?pretty=true --data-urlencode "db=mydb" \
+--data-urlencode "q=SELECT mean(load) FROM cpu WHERE region='uswest'"
+```
+
 ## Helpful Links
 
 * Understand the [design goals and motivations of the project](http://influxdb.com/docs/v0.9/introduction/overview.html).
 * Follow the [getting started guide](http://influxdb.com/docs/v0.9/introduction/getting_started.html) to find out how to install InfluxDB, start writing more data, and issue more queries - in just a few minutes.
 * See the  [HTTP API documentation to start writing a library for your favorite language](http://influxdb.com/docs/v0.9/concepts/reading_and_writing_data.html).
-

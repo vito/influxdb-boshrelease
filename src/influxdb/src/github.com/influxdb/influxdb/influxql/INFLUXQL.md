@@ -4,13 +4,11 @@
 
 This is a reference for the Influx Query Language ("InfluxQL").
 
-InfluxQL is a SQL-like query language for interacting with InfluxDB.  It has been lovingly crafted to feel familiar to those coming from other
-SQL or SQL-like environments while providing features specific to storing
-and analyzing time series data.
+InfluxQL is a SQL-like query language for interacting with InfluxDB.  It has been lovingly crafted to feel familiar to those coming from other SQL or SQL-like environments while providing features specific to storing and analyzing time series data.
 
 ## Notation
 
-This specification uses the same notation used by Google's Go programming language, which can be found at http://golang.org.  The syntax is specified in Extended Backus-Naur Form ("EBNF"):
+The syntax is specified using Extended Backus-Naur Form ("EBNF").  EBNF is the same notation used in the [Go](http://golang.org) programming language specification, which can be found [here](https://golang.org/ref/spec).  Not so coincidentally, InfluxDB is written in Go.
 
 ```
 Production  = production_name "=" [ Expression ] "." .
@@ -31,50 +29,43 @@ Notation operators in order of increasing precedence:
 {}  repetition (0 to n times)
 ```
 
-## Characters & Digits
+## Query representation
+
+### Characters
+
+InfluxQL is Unicode text encoded in [UTF-8](http://en.wikipedia.org/wiki/UTF-8).
 
 ```
 newline             = /* the Unicode code point U+000A */ .
 unicode_char        = /* an arbitrary Unicode code point except newline */ .
-ascii_letter        = "A" .. "Z" | "a" .. "z" .
-decimal_digit       = "0" .. "9" .
 ```
 
-## Database name
+## Letters and digits
 
-Database names are more limited than other identifiers because they appear in URLs.
+Letters are the set of ASCII characters plus the underscore character _ (U+005F) is considered a letter.
 
-The rules:
-
-- must start with an upper or lowercase ASCII letter
-- may contain only ASCII leters, decimal digits, "_", and "-"
+Only decimal digits are supported.
 
 ```
-db_name             = ascii_letter { ascii_letter | decimal_digit | "_" | "-" } .
-```
-
-#### Examples:
-
-```
-mydb
-MyDB
-my-db_3
+letter              = ascii_letter | "_" .
+ascii_letter        = "A" … "Z" | "a" … "z" .
+digit               = "0" … "9" .
 ```
 
 ## Identifiers
 
-Identifiers are things like measurement names, retention policy names, tag keys, etc.
+Identifiers are tokens which refer to database names, retention policy names, user names, measurement names, tag keys, and field names.
 
 The rules:
 
-- double quoted identifiers can contain any unicode character other than a new
+- double quoted identifiers can contain any unicode character other than a new line
 - double quoted identifiers can contain escaped `"` characters (i.e., `\"`)
-- unquoted identifiers must start with an upper or lowercase ASCII character
-- unquoted identifiers may contain only ASCII letters, decimal digits, "_", and "."
+- unquoted identifiers must start with an upper or lowercase ASCII character or "_"
+- unquoted identifiers may contain only ASCII letters, decimal digits, and "_"
 
 ```
 identifier          = unquoted_identifier | quoted_identifier .
-unquoted_identifier = ascii_letter { ascii_letter | decimal_digit | "_" | "." } .
+unquoted_identifier = ( letter ) { letter | digit } .
 quoted_identifier   = `"` unicode_char { unicode_char } `"` .
 ```
 
@@ -82,8 +73,10 @@ quoted_identifier   = `"` unicode_char { unicode_char } `"` .
 
 ```
 cpu
-"1h.cpu"
-"1_Crazy-1337.identifer>NAME"
+_cpu_stats
+"1h"
+"anything really"
+"1_Crazy-1337.identifier>NAME👍"
 ```
 
 ## Keywords
@@ -94,24 +87,29 @@ CREATE       CONTINUOUS   DATABASE     DATABASES    DEFAULT      DELETE
 DESC         DROP         DURATION     END          EXISTS       EXPLAIN
 FIELD        FROM         GRANT        GROUP        IF           IN
 INNER        INSERT       INTO         KEY          KEYS         LIMIT
-SHOW         MEASUREMENT  MEASUREMENTS OFFSET       ON           ORDER
-PASSWORD     POLICY       POLICIES     PRIVILEGES   QUERIES      QUERY
-READ         REPLICATION  RETENTION    REVOKE       SELECT       SERIES
-SLIMIT       SOFFSET      TAG          TO           USER         USERS
-VALUES       WHERE        WITH         WRITE
+SHOW         MEASUREMENT  MEASUREMENTS NOT          OFFSET       ON
+ORDER        PASSWORD     POLICY       POLICIES     PRIVILEGES   QUERIES
+QUERY        READ         REPLICATION  RETENTION    REVOKE       SELECT
+SERIES       SLIMIT       SOFFSET      TAG          TO           USER
+USERS        VALUES       WHERE        WITH         WRITE
 ```
 
 ## Literals
 
-### Numbers
+### Integers
 
-InfluxQL supports decimal integer literals and float literals.  Hex, octal, etc. are not
-currently supported.
+InfluxQL supports decimal integer literals.  Hexadecimal and octal literals are not currently supported.
 
 ```
-int_lit             = decimal_lit .
-decimal_lit         = ( "1" .. "9" ) { decimal_digit } .
-float_lit           = decimals "." decimals .
+int_lit             = ( "1" … "9" ) { digit } .
+```
+
+### Floats
+
+InfluxQL supports floating-point literals.  Exponents are not currently supported.
+
+```
+float_lit           = int_lit "." int_lit .
 ```
 
 ### Strings
@@ -124,9 +122,9 @@ string_lit          = `'` { unicode_char } `'`' .
 
 ### Durations
 
-Duration literals specify a length of time and are specified by an integer
-followed by (without spaces) the duration units.
+Duration literals specify a length of time.  An integer literal followed immediately (with no spaces) by a duration unit listed below is interpreted as a duration literal.
 
+### Duration units
 | Units  | Meaning                                 |
 |--------|-----------------------------------------|
 | u or µ | microseconds (1 millionth of a second)  |
@@ -137,26 +135,22 @@ followed by (without spaces) the duration units.
 | d      | day                                     |
 | w      | week                                    |
 
-
 ```
-duration_lit        = decimals duration_unit .
+duration_lit        = int_lit duration_unit .
 duration_unit       = "u" | "µ" | "s" | "h" | "d" | "w" | "ms" .
 ```
 
 ### Dates & Times
 
-The date & time literal format is not specified in EBNF like the rest of this
-document.  It is specified using Go's date / time parsing format, which is
-a reference date written in the format required by InfluxQL.  The reference
-date time is:
+The date and time literal format is not specified in EBNF like the rest of this document.  It is specified using Go's date / time parsing format, which is a reference date written in the format required by InfluxQL.  The reference date time is:
 
-January 2nd, 2006 at 3:04:05 PM
+InfluxQL reference date time: January 2nd, 2006 at 3:04:05 PM
 
 ```
 time_lit            = "2006-01-02 15:04:05.999999" | "2006-01-02"
 ```
 
-### Boolean
+### Booleans
 
 ```
 bool_lit            = TRUE | FALSE .
@@ -194,6 +188,7 @@ statement           = alter_retention_policy_stmt |
                       show_measurements_stmt |
                       show_retention_policies |
                       show_series_stmt |
+                      show_shards_stmt |
                       show_tag_keys_stmt |
                       show_tag_values_stmt |
                       show_users_stmt |
@@ -210,6 +205,8 @@ alter_retention_policy_stmt  = "ALTER RETENTION POLICY" policy_name "ON"
                                db_name retention_policy_option
                                [ retention_policy_option ]
                                [ retention_policy_option ] .
+
+db_name                      = identifier .
 
 policy_name                  = identifier .
 
@@ -243,22 +240,23 @@ query_name                   = identifier .
 #### Examples:
 
 ```sql
-CREATE CONTINUOUS QUERY 10m_event_count
+-- selects from default retention policy and writes into 6_months retention policy
+CREATE CONTINUOUS QUERY "10m_event_count"
 ON db_name
 BEGIN
   SELECT count(value)
-  INTO 10m.events
+  INTO "6_months".events
   FROM events
   GROUP BY time(10m)
 END;
 
--- this selects from the output of one continuous query and outputs to another series
-CREATE CONTINUOUS QUERY 1h_event_count
+-- this selects from the output of one continuous query in one retention policy and outputs to another series in another retention policy
+CREATE CONTINUOUS QUERY "1h_event_count"
 ON db_name
 BEGIN
   SELECT sum(count) as count
-  INTO 1h.events
-  FROM events
+  INTO "2_years".events
+  FROM "6_months".events
   GROUP BY time(1h)
 END;
 ```
@@ -305,11 +303,11 @@ create_user_stmt = "CREATE USER" user_name "WITH PASSWORD" password
 
 ```sql
 -- Create a normal database user.
-CREATE USER jdoe WITH PASSWORD "1337password";
+CREATE USER jdoe WITH PASSWORD '1337password';
 
 -- Create a cluster admin.
 -- Note: Unlike the GRANT statement, the "PRIVILEGES" keyword is required here.
-CREATE USER jdoe WITH PASSWORD "1337password" WITH ALL PRIVILEGES;
+CREATE USER jdoe WITH PASSWORD '1337password' WITH ALL PRIVILEGES;
 ```
 
 ### DELETE
@@ -455,7 +453,7 @@ SHOW FIELD KEYS FROM cpu;
 
 ### SHOW MEASUREMENTS
 
-show_measurements_stmt = [ where_clause ] [ group_by_clause ] [ limit_clause ]
+show_measurements_stmt = "SHOW MEASUREMENTS" [ where_clause ] [ group_by_clause ] [ limit_clause ]
                          [ offset_clause ] .
 
 ```sql
@@ -469,20 +467,20 @@ SHOW MEASUREMENTS WHERE region = 'uswest' AND host = 'serverA';
 ### SHOW RETENTION POLICIES
 
 ```
-show_retention_policies = "SHOW RETENTION POLICIES" db_name .
+show_retention_policies = "SHOW RETENTION POLICIES ON" db_name .
 ```
 
 #### Example:
 
 ```sql
 -- show all retention policies on a database
-SHOW RETENTION POLICIES mydb;
+SHOW RETENTION POLICIES ON mydb;
 ```
 
 ### SHOW SERIES
 
 ```
-show_series_stmt = [ from_clause ] [ where_clause ] [ group_by_clause ]
+show_series_stmt = "SHOW SERIES" [ from_clause ] [ where_clause ] [ group_by_clause ]
                    [ limit_clause ] [ offset_clause ] .
 ```
 
@@ -492,10 +490,22 @@ show_series_stmt = [ from_clause ] [ where_clause ] [ group_by_clause ]
 
 ```
 
+### SHOW SHARDS
+
+```
+show_shards_stmt = "SHOW SHARDS" .
+```
+
+#### Example:
+
+```sql
+SHOW SHARDS;
+```
+
 ### SHOW TAG KEYS
 
 ```
-show_tag_keys_stmt = [ from_clause ] [ where_clause ] [ group_by_clause ]
+show_tag_keys_stmt = "SHOW TAG KEYS" [ from_clause ] [ where_clause ] [ group_by_clause ]
                      [ limit_clause ] [ offset_clause ] .
 ```
 
@@ -511,14 +521,14 @@ SHOW TAG KEYS FROM cpu;
 -- show all tag keys from the cpu measurement where the region key = 'uswest'
 SHOW TAG KEYS FROM cpu WHERE region = 'uswest';
 
--- show sll tag keys where the host key = 'serverA'
+-- show all tag keys where the host key = 'serverA'
 SHOW TAG KEYS WHERE host = 'serverA';
 ```
 
 ### SHOW TAG VALUES
 
 ```
-show_tag_values_stmt = [ from_clause ] with_tag_clause [ where_clause ]
+show_tag_values_stmt = "SHOW TAG VALUES" [ from_clause ] with_tag_clause [ where_clause ]
                        [ group_by_clause ] [ limit_clause ] [ offset_clause ] .
 ```
 
@@ -551,7 +561,7 @@ SHOW USERS;
 ### REVOKE
 
 ```
-revoke_stmt = privilege [ "ON" db_name ] "FROM" user_name
+revoke_stmt = "REVOKE" privilege [ "ON" db_name ] "FROM" user_name
 ```
 
 #### Examples:
@@ -567,7 +577,7 @@ REVOKE READ ON mydb FROM jdoe;
 ### SELECT
 
 ```
-select_stmt = fields from_clause [ into_clause ] [ where_clause ]
+select_stmt = "SELECT" fields from_clause [ into_clause ] [ where_clause ]
               [ group_by_clause ] [ order_by_clause ] [ limit_clause ]
               [ offset_clause ] [ slimit_clause ] [ soffset_clause ].
 ```
@@ -611,15 +621,13 @@ binary_op        = "+" | "-" | "*" | "/" | "AND" | "OR" | "=" | "!=" | "<" |
 
 expr             = unary_expr { binary_op unary_expr } .
 
-unary_expr       = "(" expr ")" | var_ref | time_lit | string_lit |
-                   number_lit | bool_lit | duration_lit | regex_lit .
+unary_expr       = "(" expr ")" | var_ref | time_lit | string_lit | int_lit |
+                   float_lit | bool_lit | duration_lit | regex_lit .
 ```
 
 ## Other
 
 ```
-decimals          = decimal_digit { decimal_digit } .
-
 dimension         = expr .
 
 dimensions        = dimension { "," dimension } .

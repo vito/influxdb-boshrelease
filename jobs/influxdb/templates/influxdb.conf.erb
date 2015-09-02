@@ -1,99 +1,128 @@
-# Welcome to the InfluxDB configuration file.
+# 99% generated from `influxd config`; only the hostname is changed
 
-# If hostname (on the OS) doesn't return a name that can be resolved by the other
-# systems in the cluster, you'll have to set the hostname to an IP or something
-# that can be resolved here.
-<% localip = p('influxdb.ips')[spec.index]%>
+<%
+  def discover_external_ip
+    networks = spec.networks.marshal_dump
 
-hostname = "<%=localip%>"
+    _, network = networks.find do |_name, network_spec|
+      network_spec.default
+    end
+
+    if !network
+      _, network = networks.first
+    end
+
+    if !network
+      raise "Could not determine IP via network spec: #{networks}"
+    end
+
+    network.ip
+  end
+%>
 
 reporting-disabled = true
 
-# Controls certain parameters that only take effect until an initial successful
-# start-up has occurred.
-[initialization]
-join-urls = ""
-
-# Control authentication
-[authentication]
-enabled = false
-
-[logging]
-file   = "/var/vcap/sys/log/influxdb/influxdb.log"
-write-tracing = true
-raft-tracing = true
-
-[statistics]
-enabled = false
-database = "_internal"
-retention-policy = "default"
-write-interval = "1m"
-
-# Configure the admin server
-[admin]
-enabled = false
-port = 8083
-
-# Configure the http api
-[api]
-#ssl-port = 8087    # Ssl support is enabled if you set a port and cert
-#ssl-cert = "../cert.pem"
-
-# connections will timeout after this amount of time. Ensures that clients that misbehave
-# and keep alive connections they don't use won't end up connection a million times.
-# However, if a request is taking longer than this to complete, could be a problem.
-read-timeout = "5s"
-
-[input_plugins]
-
-#  [input_plugins.udp]
-#  enabled = true
-#  port = 4444
-#  database = "test"
-
-# Configure the Graphite servers
-#[[graphite]]
-#protocol = "TCP"
-#enabled = true
-#address = "192.168.0.1"
-#port = 2003
-#database = "graphite_tcp"  # store graphite data in this database
-#name-position = "last"
-#name-separator = "-"
-
-#[[graphite]]
-#protocol = "udP"
-#enabled = true
-#address = "192.168.0.2"
-#port = 2005
-
-# Configure collectd server
-#[collectd]
-#enabled = true
-#address = "192.168.0.3"
-#port = 25827
-#database = "collectd_database"
-#typesdb = "foo-db-type"
-
-# Broker configuration
-[broker]
-# The broker port should be open between all servers in a cluster.
-# However, this port shouldn't be accessible from the internet.
-port = 8086
-
-# Where the broker logs are stored. The user running InfluxDB will need read/write access.
-dir  = "/var/vcap/store/influxdb/broker"
-
-# election-timeout = "2s"
+[meta]
+  dir = "/var/vcap/store/influxdb/meta"
+  hostname = "<%= discover_external_ip %>"
+  bind-address = ":8088"
+  retention-autocreate = true
+  election-timeout = "1s"
+  heartbeat-timeout = "1s"
+  leader-lease-timeout = "500ms"
+  commit-timeout = "50ms"
+  cluster-tracing = false
 
 [data]
-dir = "/var/vcap/store/influxdb/db"
-retention-auto-create = false
-retention-check-enabled = true
-retention-check-period = "5m"
-
-[continuous_queries]
-disable = false
+  dir = "/var/vcap/store/influxdb/data"
+  max-wal-size = 104857600
+  wal-flush-interval = "10m0s"
+  wal-partition-flush-delay = "2s"
+  wal-dir = "/var/vcap/store/influxdb/wal"
+  wal-enable-logging = true
+  wal-ready-series-size = 30720
+  wal-compaction-threshold = 0.5
+  wal-max-series-size = 1048576
+  wal-flush-cold-interval = "5m0s"
+  wal-partition-size-threshold = 20971520
 
 [cluster]
-dir = "/var/vcap/store/influxdb/cluster"
+  force-remote-mapping = false
+  write-timeout = "5s"
+  shard-writer-timeout = "5s"
+  shard-mapper-timeout = "5s"
+
+[retention]
+  enabled = true
+  check-interval = "30m0s"
+
+[shard-precreation]
+  enabled = true
+  check-interval = "10m0s"
+  advance-period = "30m0s"
+
+[admin]
+  enabled = true
+  bind-address = ":8083"
+  https-enabled = false
+  https-certificate = "/etc/ssl/influxdb.pem"
+
+[monitor]
+  store-enabled = false
+  store-database = "_internal"
+  store-interval = "1m0s"
+  store-address = "127.0.0.1:8086"
+
+[http]
+  enabled = true
+  bind-address = ":8086"
+  auth-enabled = false
+  log-enabled = true
+  write-tracing = false
+  pprof-enabled = false
+  https-enabled = false
+  https-certificate = "/etc/ssl/influxdb.pem"
+
+[[graphite]]
+  bind-address = ":2003"
+  database = "graphite"
+  enabled = false
+  protocol = "tcp"
+  batch-size = 1000
+  batch-timeout = "1s"
+  consistency-level = "one"
+  separator = "."
+
+[collectd]
+  enabled = false
+  bind-address = ":25826"
+  database = "collectd"
+  retention-policy = ""
+  batch-size = 5000
+  batch-timeout = "10s"
+  typesdb = "/usr/share/collectd/types.db"
+
+[opentsdb]
+  enabled = false
+  bind-address = ":4242"
+  database = "opentsdb"
+  retention-policy = ""
+  consistency-level = "one"
+  tls-enabled = false
+  certificate = "/etc/ssl/influxdb.pem"
+
+[continuous_queries]
+  log-enabled = true
+  enabled = true
+  recompute-previous-n = 2
+  recompute-no-older-than = "10m0s"
+  compute-runs-per-interval = 10
+  compute-no-more-than = "2m0s"
+
+[hinted-handoff]
+  enabled = true
+  dir = "/var/vcap/store/influxdb/hh"
+  max-size = 1073741824
+  max-age = "168h0m0s"
+  retry-rate-limit = 0
+  retry-interval = "1s"
