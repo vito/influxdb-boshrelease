@@ -1,5 +1,5 @@
 ---
-go/go1.5.1.src.tar.gz:
-  object_id: 3b13bc68-a0ef-4103-a826-e534af8be9b3
-  sha: 0df564746d105f4180c2b576a1553ebca9d9a124
-  size: 12049701
+go/go1.5.1.linux-amd64.tar.gz:
+  object_id: f98c6f66-d15d-4e08-a809-386df0928a0c
+  sha: 46eecd290d8803887dec718c691cc243f2175fe0
+  size: 77875767
