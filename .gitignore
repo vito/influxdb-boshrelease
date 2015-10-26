@@ -2,7 +2,6 @@
 .bundle
 .cache
 .dev_builds
-.final_builds
 .idea
 blobs
 config/dev.yml
