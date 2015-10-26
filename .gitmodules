@@ -1,0 +1,68 @@
+[submodule "src/influxdb/src/github.com/hashicorp/raft"]
+	path = src/influxdb/src/github.com/hashicorp/raft
+	url = https://github.com/hashicorp/raft
+	branch = master
+[submodule "src/influxdb/src/github.com/hashicorp/raft-boltdb"]
+	path = src/influxdb/src/github.com/hashicorp/raft-boltdb
+	url = https://github.com/hashicorp/raft-boltdb
+	branch = master
+[submodule "src/influxdb/src/github.com/influxdb/influxdb"]
+	path = src/influxdb/src/github.com/influxdb/influxdb
+	url = https://github.com/influxdb/influxdb
+	branch = master
+[submodule "src/influxdb/src/github.com/rakyll/statik"]
+	path = src/influxdb/src/github.com/rakyll/statik
+	url = https://github.com/rakyll/statik
+	branch = master
+[submodule "src/influxdb/src/github.com/BurntSushi/toml"]
+	path = src/influxdb/src/github.com/BurntSushi/toml
+	url = https://github.com/BurntSushi/toml
+	branch = master
+[submodule "src/influxdb/src/github.com/dgryski/go-bitstream"]
+	path = src/influxdb/src/github.com/dgryski/go-bitstream
+	url = https://github.com/dgryski/go-bitstream
+	branch = master
+[submodule "src/influxdb/src/github.com/boltdb/bolt"]
+	path = src/influxdb/src/github.com/boltdb/bolt
+	url = https://github.com/boltdb/bolt
+	branch = master
+[submodule "src/influxdb/src/github.com/dgryski/go-bits"]
+	path = src/influxdb/src/github.com/dgryski/go-bits
+	url = https://github.com/dgryski/go-bits
+	branch = master
+[submodule "src/influxdb/src/github.com/gogo/protobuf"]
+	path = src/influxdb/src/github.com/gogo/protobuf
+	url = https://github.com/gogo/protobuf
+	branch = master
+[submodule "src/influxdb/src/github.com/kimor79/gollectd"]
+	path = src/influxdb/src/github.com/kimor79/gollectd
+	url = https://github.com/kimor79/gollectd
+	branch = master
+[submodule "src/influxdb/src/golang.org/x/crypto"]
+	path = src/influxdb/src/golang.org/x/crypto
+	url = https://go.googlesource.com/crypto
+	branch = master
+[submodule "src/influxdb/src/github.com/armon/go-metrics"]
+	path = src/influxdb/src/github.com/armon/go-metrics
+	url = https://github.com/armon/go-metrics
+	branch = master
+[submodule "src/influxdb/src/github.com/bmizerany/pat"]
+	path = src/influxdb/src/github.com/bmizerany/pat
+	url = https://github.com/bmizerany/pat
+	branch = master
+[submodule "src/influxdb/src/github.com/jwilder/encoding"]
+	path = src/influxdb/src/github.com/jwilder/encoding
+	url = https://github.com/jwilder/encoding
+	branch = master
+[submodule "src/influxdb/src/gopkg.in/fatih/pool.v2"]
+	path = src/influxdb/src/gopkg.in/fatih/pool.v2
+	url = https://gopkg.in/fatih/pool.v2
+	branch = master
+[submodule "src/influxdb/src/github.com/golang/snappy"]
+	path = src/influxdb/src/github.com/golang/snappy
+	url = https://github.com/golang/snappy
+	branch = master
+[submodule "src/influxdb/src/github.com/hashicorp/go-msgpack"]
+	path = src/influxdb/src/github.com/hashicorp/go-msgpack
+	url = https://github.com/hashicorp/go-msgpack
+	branch = master
