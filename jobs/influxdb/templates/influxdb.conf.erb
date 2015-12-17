@@ -126,3 +126,8 @@ reporting-disabled = true
   max-age = "168h0m0s"
   retry-rate-limit = 0
   retry-interval = "1s"
+
+[[udp]]
+  enabled = true
+  bind-address = ":8089" # the bind address
+  database = "<%= p('influxdb.database') %>" # Name of the database that will be written to
