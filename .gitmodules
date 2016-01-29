@@ -66,3 +66,7 @@
 	path = src/influxdb/src/github.com/hashicorp/go-msgpack
 	url = https://github.com/hashicorp/go-msgpack
 	branch = master
+[submodule "src/influxdb/src/github.com/influxdb/usage-client"]
+	path = src/influxdb/src/github.com/influxdb/usage-client
+	url = https://github.com/influxdb/usage-client
+	branch = master
