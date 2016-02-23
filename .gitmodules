@@ -8,7 +8,7 @@
 	branch = master
 [submodule "src/influxdb/src/github.com/influxdb/influxdb"]
 	path = src/influxdb/src/github.com/influxdb/influxdb
-	url = https://github.com/influxdb/influxdb
+	url = https://github.com/influxdata/influxdb
 	branch = master
 [submodule "src/influxdb/src/github.com/rakyll/statik"]
 	path = src/influxdb/src/github.com/rakyll/statik

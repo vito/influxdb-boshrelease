@@ -3,4 +3,4 @@ final_name: influxdb
 blobstore:
   provider: s3
   options:
-    bucket_name: concourse-influxdb-release-blobs
+    bucket_name: 18f-boshrelease-blob
