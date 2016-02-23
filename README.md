@@ -8,3 +8,6 @@
 - Run `bosh create release`.
 - Make sure it works by deploying.
 - When finished, run `bosh create release --final`
+
+Now whenever you want to use the release
+- Run `bosh upload release releases/influxdb/influxdb-<release number>.yml`
