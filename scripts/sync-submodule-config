@@ -4,13 +4,35 @@ set -e -x
 
 REPO=$(cd $(dirname $0)/.. && pwd)
 export GOPATH=$REPO/src/influxdb
-
 # for gosub to be able to bootstrap
 touch $REPO/.gitmodules
 
+# NOTICE
+# All commented out lines will work in future versions. In all versions <v0.11 (version v0.11 is not out yet),
+# the repo owner was "influxdb". In future versions, the repo owner will be "influxdata".
+
+rm -rf src/influxdb/
+go get github.com/vito/gosub
+#mkdir -p $GOPATH/src/github.com/influxdata/influxdb
+mkdir -p $GOPATH/src/github.com/influxdb/influxdb
+
+# This still downloads from the new appropriate repo owner "influxdata" but puts the code in it's old repo owner per Go rules.
+git clone https://github.com/influxdata/influxdb.git $GOPATH/src/github.com/influxdb/influxdb
+#git clone https://github.com/influxdata/influxdb.git $GOPATH/src/github.com/influxdata/influxdb
+cd $GOPATH/src/github.com/influxdb/influxdb
+#cd $GOPATH/src/github.com/influxdata/influxdb
+# Checkout the latest
+git checkout v0.10.1
+# Future versions will help with vendor code, just uncomment out the following line to enable using the code.
+#curl -s https://raw.githubusercontent.com/pote/gpm/v1.4.0/bin/gpm | bash
+cd -
+
+
 # so we can start from scratch
 go get -d -v github.com/influxdb/influxdb/cmd/influxd
+#go get -d -v github.com/influxdata/influxdb/cmd/influxd
 
-# sync errything
-gosub list -a github.com/influxdb/influxdb/cmd/influxd | \
-  xargs gosub sync -r $REPO -g $GOPATH
+# sync everything
+#$GOPATH/bin/gosub list -a github.com/influxdata/influxdb/cmd/influxd | \
+$GOPATH/bin/gosub list -a github.com/influxdb/influxdb/cmd/influxd | \
+  xargs $GOPATH/bin/gosub sync -r $REPO -g $GOPATH

@@ -8,4 +8,6 @@ config/dev.yml
 config/private.yml
 dev_releases
 pkg
+*.sw*
 src/influxdb/bin
+*credentials.yml

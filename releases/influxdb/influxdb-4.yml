@@ -1,0 +1,32 @@
+---
+packages:
+- name: bootstrapper
+  version: c81d19bed468a72d67f8d40085c2fe7612166c4c
+  fingerprint: c81d19bed468a72d67f8d40085c2fe7612166c4c
+  sha1: 543b15c3e63411aa64ded632212493824c2acd6b
+  dependencies:
+  - go
+- name: go
+  version: f62e4a130d898bf6102bcb7c038e759c46aa6d23
+  fingerprint: f62e4a130d898bf6102bcb7c038e759c46aa6d23
+  sha1: 4b372a48f5485b922de10c3e2cdb05e5377b7087
+  dependencies: []
+- name: influxdb
+  version: eb096e3bd9662acfca2056f117a114ff43991538
+  fingerprint: eb096e3bd9662acfca2056f117a114ff43991538
+  sha1: 1e52e2f038820bc6f91e607136706384561f4b5c
+  dependencies:
+  - go
+jobs:
+- name: influxdb
+  version: 958b9e5049a32cf447f3fe59a9504ab055e9a152
+  fingerprint: 958b9e5049a32cf447f3fe59a9504ab055e9a152
+  sha1: 0c4406b8ada516d21197f33148547a32cd033805
+license:
+  version: 20f5c57713d88e62da7ca2d033365f09d096cfb2
+  fingerprint: 20f5c57713d88e62da7ca2d033365f09d096cfb2
+  sha1: 5ed3baa87c1d2e2a89ca582a87a439da1f87c506
+commit_hash: b385f297
+uncommitted_changes: true
+name: influxdb
+version: '4'
