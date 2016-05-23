@@ -3,7 +3,7 @@ set -e
 
 cd influxdb
 
-export GOROOT=$(readlink -nf /var/vcap/packages/go)
+export GOROOT=$(readlink -nf /var/vcap/packages/golang)
 export GOPATH=$PWD
 export GOBIN=${BOSH_INSTALL_TARGET}
 export PATH=$PATH:$GOROOT/bin

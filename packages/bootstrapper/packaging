@@ -2,7 +2,7 @@
 set -e
 
 
-export GOROOT=$(readlink -nf /var/vcap/packages/go)
+export GOROOT=$(readlink -nf /var/vcap/packages/golang)
 export GOPATH=${PWD}/bootstrapper:${PWD}/influxdb
 export GOBIN=${BOSH_INSTALL_TARGET}
 export PATH=$PATH:$GOROOT/bin

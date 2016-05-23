@@ -2,7 +2,7 @@
 name: bootstrapper
 
 dependencies:
-- go
+- golang
 
 files:
 - bootstrapper/**/*
