@@ -6,7 +6,7 @@ import (
 	"net/url"
 	"os"
 
-	"github.com/influxdb/influxdb/client"
+	"github.com/influxdata/influxdb/client"
 )
 
 func main() {
