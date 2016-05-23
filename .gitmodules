@@ -1,11 +1,3 @@
-[submodule "src/influxdb/src/github.com/hashicorp/raft"]
-	path = src/influxdb/src/github.com/hashicorp/raft
-	url = https://github.com/hashicorp/raft
-	branch = master
-[submodule "src/influxdb/src/github.com/hashicorp/raft-boltdb"]
-	path = src/influxdb/src/github.com/hashicorp/raft-boltdb
-	url = https://github.com/hashicorp/raft-boltdb
-	branch = master
 [submodule "src/influxdb/src/github.com/influxdb/influxdb"]
 	path = src/influxdb/src/github.com/influxdb/influxdb
 	url = https://github.com/influxdb/influxdb
@@ -21,10 +13,6 @@
 [submodule "src/influxdb/src/github.com/dgryski/go-bitstream"]
 	path = src/influxdb/src/github.com/dgryski/go-bitstream
 	url = https://github.com/dgryski/go-bitstream
-	branch = master
-[submodule "src/influxdb/src/github.com/boltdb/bolt"]
-	path = src/influxdb/src/github.com/boltdb/bolt
-	url = https://github.com/boltdb/bolt
 	branch = master
 [submodule "src/influxdb/src/github.com/dgryski/go-bits"]
 	path = src/influxdb/src/github.com/dgryski/go-bits
@@ -42,10 +30,6 @@
 	path = src/influxdb/src/golang.org/x/crypto
 	url = https://go.googlesource.com/crypto
 	branch = master
-[submodule "src/influxdb/src/github.com/armon/go-metrics"]
-	path = src/influxdb/src/github.com/armon/go-metrics
-	url = https://github.com/armon/go-metrics
-	branch = master
 [submodule "src/influxdb/src/github.com/bmizerany/pat"]
 	path = src/influxdb/src/github.com/bmizerany/pat
 	url = https://github.com/bmizerany/pat
@@ -54,19 +38,23 @@
 	path = src/influxdb/src/github.com/jwilder/encoding
 	url = https://github.com/jwilder/encoding
 	branch = master
-[submodule "src/influxdb/src/gopkg.in/fatih/pool.v2"]
-	path = src/influxdb/src/gopkg.in/fatih/pool.v2
-	url = https://gopkg.in/fatih/pool.v2
-	branch = master
 [submodule "src/influxdb/src/github.com/golang/snappy"]
 	path = src/influxdb/src/github.com/golang/snappy
 	url = https://github.com/golang/snappy
 	branch = master
-[submodule "src/influxdb/src/github.com/hashicorp/go-msgpack"]
-	path = src/influxdb/src/github.com/hashicorp/go-msgpack
-	url = https://github.com/hashicorp/go-msgpack
+[submodule "src/influxdb/src/github.com/influxdata/influxdb"]
+	path = src/influxdb/src/github.com/influxdata/influxdb
+	url = https://github.com/influxdata/influxdb
 	branch = master
-[submodule "src/influxdb/src/github.com/influxdb/usage-client"]
-	path = src/influxdb/src/github.com/influxdb/usage-client
-	url = https://github.com/influxdb/usage-client
+[submodule "src/influxdb/src/github.com/dgrijalva/jwt-go"]
+	path = src/influxdb/src/github.com/dgrijalva/jwt-go
+	url = https://github.com/dgrijalva/jwt-go
+	branch = master
+[submodule "src/influxdb/src/github.com/davecgh/go-spew"]
+	path = src/influxdb/src/github.com/davecgh/go-spew
+	url = https://github.com/davecgh/go-spew
+	branch = master
+[submodule "src/influxdb/src/github.com/influxdata/usage-client"]
+	path = src/influxdb/src/github.com/influxdata/usage-client
+	url = https://github.com/influxdata/usage-client
 	branch = master

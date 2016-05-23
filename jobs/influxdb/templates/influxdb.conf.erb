@@ -1,66 +1,36 @@
-# 99% generated from `influxd config`; only the hostname is changed
-
-<%
-  def discover_external_ip
-    networks = spec.networks.marshal_dump
-
-    _, network = networks.find do |_name, network_spec|
-      network_spec.default
-    end
-
-    if !network
-      _, network = networks.first
-    end
-
-    if !network
-      raise "Could not determine IP via network spec: #{networks}"
-    end
-
-    network.ip
-  end
-%>
-
 reporting-disabled = true
+bind-address = ":8088"
+hostname = "<%= spec.address %>"
+join = ""
 
 [meta]
   dir = "/var/vcap/store/influxdb/meta"
-  hostname = "<%= discover_external_ip %>"
-  bind-address = ":8088"
   retention-autocreate = true
-  election-timeout = "1s"
-  heartbeat-timeout = "1s"
-  leader-lease-timeout = "500ms"
-  commit-timeout = "50ms"
-  cluster-tracing = false
-  raft-promotion-enabled = true
   logging-enabled = true
+  pprof-enabled = false
+  lease-duration = "1m0s"
 
 [data]
   dir = "/var/vcap/store/influxdb/data"
-  engine = "bz1"
-  max-wal-size = 104857600
-  wal-flush-interval = "10m0s"
-  wal-partition-flush-delay = "2s"
   wal-dir = "/var/vcap/store/influxdb/wal"
+  engine = "tsm1"
   wal-logging-enabled = true
-  wal-ready-series-size = 30720
-  wal-compaction-threshold = 0.5
-  wal-max-series-size = 1048576
-  wal-flush-cold-interval = "5s"
-  wal-partition-size-threshold = 52428800
   query-log-enabled = true
   cache-max-memory-size = 524288000
   cache-snapshot-memory-size = 26214400
   cache-snapshot-write-cold-duration = "1h0m0s"
-  compact-min-file-count = 3
   compact-full-write-cold-duration = "24h0m0s"
   max-points-per-block = 0
+  data-logging-enabled = true
 
-[cluster]
-  force-remote-mapping = false
-  write-timeout = "5s"
-  shard-writer-timeout = "5s"
-  shard-mapper-timeout = "5s"
+[coordinator]
+  write-timeout = "10s"
+  max-concurrent-queries = 0
+  query-timeout = "0"
+  log-queries-after = "0"
+  max-select-point = 0
+  max-select-series = 0
+  max-select-buckets = 0
 
 [retention]
   enabled = true
@@ -76,6 +46,7 @@ reporting-disabled = true
   bind-address = ":8083"
   https-enabled = false
   https-certificate = "/etc/ssl/influxdb.pem"
+  Version = ""
 
 [monitor]
   store-enabled = true
@@ -84,6 +55,7 @@ reporting-disabled = true
 
 [subscriber]
   enabled = true
+  http-timeout = "30s"
 
 [http]
   enabled = true
@@ -94,8 +66,24 @@ reporting-disabled = true
   pprof-enabled = false
   https-enabled = false
   https-certificate = "/etc/ssl/influxdb.pem"
+  https-private-key = ""
+  max-row-limit = 10000
+  max-connection-limit = 0
+  shared-secret = ""
 
-[collectd]
+[[graphite]]
+  enabled = false
+  bind-address = ":2003"
+  database = "graphite"
+  protocol = "tcp"
+  batch-size = 5000
+  batch-pending = 10
+  batch-timeout = "1s"
+  consistency-level = "one"
+  separator = "."
+  udp-read-buffer = 0
+
+[[collectd]]
   enabled = false
   bind-address = ":25826"
   database = "collectd"
@@ -106,7 +94,7 @@ reporting-disabled = true
   read-buffer = 0
   typesdb = "/usr/share/collectd/types.db"
 
-[opentsdb]
+[[opentsdb]]
   enabled = false
   bind-address = ":4242"
   database = "opentsdb"
@@ -119,20 +107,19 @@ reporting-disabled = true
   batch-timeout = "1s"
   log-point-errors = true
 
+[[udp]]
+  enabled = false
+  bind-address = ":8089"
+  database = "udp"
+  retention-policy = ""
+  batch-size = 5000
+  batch-pending = 10
+  read-buffer = 0
+  batch-timeout = "1s"
+  precision = ""
+
 [continuous_queries]
   log-enabled = true
   enabled = true
-  recompute-previous-n = 2
-  recompute-no-older-than = "10m0s"
-  compute-runs-per-interval = 10
-  compute-no-more-than = "2m0s"
+  run-interval = "1s"
 
-[hinted-handoff]
-  enabled = true
-  dir = "/var/vcap/store/influxdb/hh"
-  max-size = 1073741824
-  max-age = "168h0m0s"
-  retry-rate-limit = 0
-  retry-interval = "1s"
-  retry-max-interval = "1m0s"
-  purge-interval = "1h0m0s"
