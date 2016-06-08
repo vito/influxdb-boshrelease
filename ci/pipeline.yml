@@ -37,6 +37,7 @@ resources:
 - name: release-tarball
   type: s3
   source:
+    region_name: {{s3-bosh-releases-region}}
     bucket: {{s3-bosh-releases-bucket}}
     regexp: influxdb-(.*).tgz
     access_key_id: {{s3-bosh-releases-access-key-id}}
@@ -44,6 +45,7 @@ resources:
 - name: final-builds-dir-tarball
   type: s3
   source:
+    region_name: {{s3-bosh-releases-region}}
     bucket: {{s3-bosh-releases-bucket}}
     versioned_file: final-builds-dir-influxdb.tgz
     access_key_id: {{s3-bosh-releases-access-key-id}}
@@ -51,6 +53,7 @@ resources:
 - name: releases-dir-tarball
   type: s3
   source:
+    region_name: {{s3-bosh-releases-region}}
     bucket: {{s3-bosh-releases-bucket}}
     versioned_file: releases-dir-influxdb.tgz
     access_key_id: {{s3-bosh-releases-access-key-id}}
