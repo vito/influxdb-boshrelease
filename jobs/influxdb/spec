@@ -23,3 +23,10 @@ properties:
   influxdb.replication:
     default: "1"
     description: "default replication count for database"
+
+  influxdb.udp.enabled:
+    default: "false"
+    description: "enable udp service"
+  influxdb.udp.bind_address:
+    default: ":8089"
+    description: "udp service bind address"
