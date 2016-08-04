@@ -108,9 +108,9 @@ join = ""
   log-point-errors = true
 
 [[udp]]
-  enabled = false
-  bind-address = ":8089"
-  database = "udp"
+  enabled = <%= p("influxdb.udp.enabled") %>
+  bind-address = "<%= p("influxdb.udp.bind_address") %>"
+  database = "<%= p("influxdb.database") %>"
   retention-policy = ""
   batch-size = 5000
   batch-pending = 10
