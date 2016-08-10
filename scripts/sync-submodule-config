@@ -22,7 +22,7 @@ git clone https://github.com/influxdata/influxdb.git $GOPATH/src/github.com/infl
 cd $GOPATH/src/github.com/influxdb/influxdb
 #cd $GOPATH/src/github.com/influxdata/influxdb
 # Checkout the latest
-git checkout v0.10.1
+git checkout v0.13.0
 # Future versions will help with vendor code, just uncomment out the following line to enable using the code.
 #curl -s https://raw.githubusercontent.com/pote/gpm/v1.4.0/bin/gpm | bash
 cd -
