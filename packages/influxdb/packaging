@@ -9,3 +9,4 @@ export GOBIN=${BOSH_INSTALL_TARGET}
 export PATH=$PATH:$GOROOT/bin
 
 go install github.com/influxdata/influxdb/cmd/influxd
+go install github.com/influxdata/influxdb/cmd/influx
