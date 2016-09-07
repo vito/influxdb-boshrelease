@@ -11,6 +11,9 @@ packages:
 properties:
   influxdb.database:
     description: "database name in influxdb to create"
+  influxdb.datadir:
+    description: "directory where influxdb will keep its data"
+    default: "/var/vcap/store/influxdb"
   influxdb.user:
     default: "root"
     description: "influx user"

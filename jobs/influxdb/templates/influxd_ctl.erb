@@ -78,16 +78,18 @@ daemon=/var/vcap/packages/influxdb/influxd
 bootstrapper=/var/vcap/packages/bootstrapper/bootstrapper
 
 # pid file for the daemon
-pidfile=/var/vcap/store/influxdb/influxd.pid
+pidfile=/var/vcap/sys/run/influxdb/influxd.pid
 
 # Configuration file
 config=/var/vcap/jobs/influxdb/config/influxdb.conf
 
-mkdir -p /var/vcap/store/influxdb
+mkdir -p $(dirname $pidfile)
+mkdir -p <%= p('influxdb.datadir') %>
 mkdir -p /var/vcap/sys/log/influxdb
 
+chown -R vcap:vcap $(dirname $pidfile)
 chown -R vcap:vcap /var/vcap/sys/log/influxdb
-chown -R vcap:vcap /var/vcap/store/influxdb
+chown -R vcap:vcap <%= p('influxdb.datadir') %>
 
 # If the daemon is not there, then exit.
 [ -x $daemon ] || exit 5

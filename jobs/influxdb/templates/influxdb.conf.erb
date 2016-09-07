@@ -4,15 +4,15 @@ hostname = "<%= spec.address %>"
 join = ""
 
 [meta]
-  dir = "/var/vcap/store/influxdb/meta"
+  dir = "<%= p('influxdb.datadir') %>/meta"
   retention-autocreate = true
   logging-enabled = true
   pprof-enabled = false
   lease-duration = "1m0s"
 
 [data]
-  dir = "/var/vcap/store/influxdb/data"
-  wal-dir = "/var/vcap/store/influxdb/wal"
+  dir = "<%= p('influxdb.datadir') %>/data"
+  wal-dir = "<%= p('influxdb.datadir') %>/wal"
   engine = "tsm1"
   wal-logging-enabled = true
   query-log-enabled = true
