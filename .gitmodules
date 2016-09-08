@@ -50,3 +50,7 @@
 	path = src/influxdb/src/gopkg.in/fatih/pool.v2
 	url = https://gopkg.in/fatih/pool.v2
 	branch = v2.0.0
+[submodule "src/influxdb/src/github.com/peterh/liner"]
+	path = src/influxdb/src/github.com/peterh/liner
+	url = https://github.com/peterh/liner
+	branch = master

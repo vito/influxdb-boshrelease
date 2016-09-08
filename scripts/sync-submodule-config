@@ -12,5 +12,6 @@ touch $REPO/.gitmodules
 go get -d -v github.com/influxdata/influxdb/cmd/influxd
 
 # sync errything
-gosub list -a github.com/influxdata/influxdb/cmd/influxd | \
+( gosub list -a github.com/influxdata/influxdb/cmd/influxd && \
+  gosub list -a github.com/influxdata/influxdb/cmd/influx ) | \
   xargs gosub sync -r $REPO -g $GOPATH
