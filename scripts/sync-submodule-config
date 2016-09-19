@@ -2,6 +2,9 @@
 
 set -e -x
 
+go get github.com/vito/gosub
+go get github.com/sparrc/gdm
+
 REPO=$(cd $(dirname $0)/.. && pwd)
 export GOPATH=$REPO/src/influxdb
 
@@ -10,6 +13,12 @@ touch $REPO/.gitmodules
 
 # so we can start from scratch
 go get -d -v github.com/influxdata/influxdb/cmd/influxd
+go get -d -v github.com/influxdata/influxdb/cmd/influx
+
+# set dependency versions with gdm
+cd $GOPATH/src/github.com/influxdata/influxdb
+git checkout v0.13.0
+gdm restore
 
 # sync errything
 ( gosub list -a github.com/influxdata/influxdb/cmd/influxd && \
