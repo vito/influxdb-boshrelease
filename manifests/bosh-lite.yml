@@ -22,6 +22,7 @@ jobs:
 properties:
   influxdb:
     ips: [10.244.7.6]
+    database: test
 
 networks:
 - name: warden-net
