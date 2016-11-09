@@ -46,11 +46,10 @@
 	path = src/influxdb/src/github.com/influxdata/usage-client
 	url = https://github.com/influxdata/usage-client
 	branch = master
-[submodule "src/influxdb/src/gopkg.in/fatih/pool.v2"]
-	path = src/influxdb/src/gopkg.in/fatih/pool.v2
-	url = https://gopkg.in/fatih/pool.v2
-	branch = v2.0.0
 [submodule "src/influxdb/src/github.com/peterh/liner"]
 	path = src/influxdb/src/github.com/peterh/liner
 	url = https://github.com/peterh/liner
 	branch = master
+[submodule "src/influxdb/src/gopkg.in/fatih/pool.v2"]
+	path = src/influxdb/src/gopkg.in/fatih/pool.v2
+	url = https://gopkg.in/fatih/pool.v2
