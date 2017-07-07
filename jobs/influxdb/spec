@@ -24,6 +24,10 @@ properties:
     default: "1"
     description: "default replication count for database"
 
+  influxdb.http.auth_enabled:
+    default: "false"
+    description: "Set to `true` to enable authentication. Warning: All commands can be executed without a user otherwise."
+
   influxdb.udp.enabled:
     default: "false"
     description: "enable udp service"

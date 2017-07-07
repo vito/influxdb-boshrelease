@@ -60,7 +60,7 @@ join = ""
 [http]
   enabled = true
   bind-address = ":8086"
-  auth-enabled = false
+  auth-enabled = <%= p("influxdb.http.auth_enabled") %>
   log-enabled = true
   write-tracing = false
   pprof-enabled = false
