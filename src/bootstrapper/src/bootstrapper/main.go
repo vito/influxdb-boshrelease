@@ -10,6 +10,7 @@ import (
 )
 
 func main() {
+	fmt.Println("Running bootstrap")
 	influxUrl := flag.String("influxUrl", "http://localhost:8086", "influx endpoint")
 	influxUser := flag.String("user", "root", "influx user")
 	influxPassword := flag.String("password", "root", "influx user's password")
@@ -34,6 +35,11 @@ func main() {
 	dbClient, err := client.NewClient(influxConfig)
 	if err != nil {
 		panic(fmt.Sprintf("Error connecting to Influx DB: %s", err))
+	}
+
+	_, err = dbClient.Query(client.Query{Command: fmt.Sprintf("CREATE USER %s WITH PASSWORD '%s' WITH ALL PRIVILEGES", *influxUser, *influxPassword)})
+	if err != nil {
+		panic(fmt.Sprintf("Error creating user. Original error: %s", err))
 	}
 
 	_, err = dbClient.Query(client.Query{Command: fmt.Sprintf("create database %s", *databaseName)})
