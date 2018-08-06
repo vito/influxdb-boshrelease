@@ -182,4 +182,3 @@
 [submodule "src/influxdb/src/golang.org/x/tools"]
     path = src/influxdb/src/golang.org/x/tools
     url = https://golang.org/x/tools
-
