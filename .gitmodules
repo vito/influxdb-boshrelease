@@ -136,4 +136,50 @@
 	url = https://go.googlesource.com/net
 [submodule "src/influxdb/src/golang.org/x/text"]
 	path = src/influxdb/src/golang.org/x/text
-	url = https://go.googlesource.com/text
+    url = https://go.googlesource.com/text
+[submodule "src/influxdb/src/github.com/armon/go-metrics"]
+    path = src/influxdb/src/github.com/armon/go-metrics
+    url = https://github.com/armon/go-metrics
+[submodule "src/influxdb/src/github.com/boltdb/bolt"]
+    path = src/influxdb/src/github.com/boltdb/bolt
+    url = https://github.com/boltdb/bolt
+[submodule "src/influxdb/src/github.com/davecgh/go-spew"]
+    path = src/influxdb/src/github.com/davecgh/go-spew
+    url = https://github.com/davecgh/go-spew
+[submodule "src/influxdb/src/github.com/dgryski/go-bits"]
+    path = src/influxdb/src/github.com/dgryski/go-bits
+    url = https://github.com/dgryski/go-bits
+[submodule "src/influxdb/src/github.com/google/go-cmp"]
+    path = src/influxdb/src/github.com/google/go-cmp
+    url = https://github.com/google/go-cmp
+[submodule "src/influxdb/src/github.com/hashicorp/go-msgpack"]
+    path = src/influxdb/src/github.com/hashicorp/go-msgpack
+    url = https://github.com/hashicorp/go-msgpack
+[submodule "src/influxdb/src/github.com/hashicorp/raft"]
+    path = src/influxdb/src/github.com/hashicorp/raft
+    url = https://github.com/hashicorp/raft
+[submodule "src/influxdb/src/github.com/hashicorp/raft-boltdb"]
+    path = src/influxdb/src/github.com/hashicorp/raft-boltdb
+    url = https://github.com/hashicorp/raft-boltdb
+[submodule "src/influxdb/src/github.com/kimor79/gollectd"]
+    path = src/influxdb/src/github.com/kimor79/gollectd
+    url = https://github.com/kimor79/gollectd
+[submodule "src/influxdb/src/github.com/mschoch/smat"]
+    path = src/influxdb/src/github.com/mschoch/smat
+    url = https://github.com/mschoch/smat
+[submodule "src/influxdb/src/github.com/paulbellamy/ratecounter"]
+    path = src/influxdb/src/github.com/paulbellamy/ratecounter
+    url = https://github.com/paulbellamy/ratecounter
+[submodule "src/influxdb/src/github.com/rakyll/statik"]
+    path = src/influxdb/src/github.com/rakyll/statik
+    url = https://github.com/rakyll/statik
+[submodule "src/influxdb/src/github.com/retailnext/hllpp"]
+    path = src/influxdb/src/github.com/retailnext/hllpp
+    url = https://github.com/retailnext/hllpp
+[submodule "src/influxdb/src/github.com/willf/bitset"]
+    path = src/influxdb/src/github.com/willf/bitset
+    url = https://github.com/willf/bitset
+[submodule "src/influxdb/src/golang.org/x/tools"]
+    path = src/influxdb/src/golang.org/x/tools
+    url = https://golang.org/x/tools
+
