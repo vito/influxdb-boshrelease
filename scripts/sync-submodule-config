@@ -17,7 +17,7 @@ go get -d -v github.com/influxdata/influxdb/cmd/influx
 
 # set dependency versions with gdm
 cd $GOPATH/src/github.com/influxdata/influxdb
-git checkout v0.13.0
+git checkout tags/v1.6.1
 gdm restore
 
 # sync errything
