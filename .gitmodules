@@ -1,7 +1,3 @@
-[submodule "src/influxdb/src/github.com/rakyll/statik"]
-	path = src/influxdb/src/github.com/rakyll/statik
-	url = https://github.com/rakyll/statik
-	branch = master
 [submodule "src/influxdb/src/github.com/BurntSushi/toml"]
 	path = src/influxdb/src/github.com/BurntSushi/toml
 	url = https://github.com/BurntSushi/toml
@@ -10,17 +6,9 @@
 	path = src/influxdb/src/github.com/dgryski/go-bitstream
 	url = https://github.com/dgryski/go-bitstream
 	branch = master
-[submodule "src/influxdb/src/github.com/dgryski/go-bits"]
-	path = src/influxdb/src/github.com/dgryski/go-bits
-	url = https://github.com/dgryski/go-bits
-	branch = master
 [submodule "src/influxdb/src/github.com/gogo/protobuf"]
 	path = src/influxdb/src/github.com/gogo/protobuf
 	url = https://github.com/gogo/protobuf
-	branch = master
-[submodule "src/influxdb/src/github.com/kimor79/gollectd"]
-	path = src/influxdb/src/github.com/kimor79/gollectd
-	url = https://github.com/kimor79/gollectd
 	branch = master
 [submodule "src/influxdb/src/golang.org/x/crypto"]
 	path = src/influxdb/src/golang.org/x/crypto
@@ -50,6 +38,147 @@
 	path = src/influxdb/src/github.com/peterh/liner
 	url = https://github.com/peterh/liner
 	branch = master
-[submodule "src/influxdb/src/gopkg.in/fatih/pool.v2"]
-	path = src/influxdb/src/gopkg.in/fatih/pool.v2
-	url = https://gopkg.in/fatih/pool.v2
+[submodule "src/influxdb/src/golang.org/x/sys"]
+	path = src/influxdb/src/golang.org/x/sys
+	url = https://go.googlesource.com/sys
+[submodule "src/influxdb/src/github.com/glycerine/go-unsnap-stream"]
+	path = src/influxdb/src/github.com/glycerine/go-unsnap-stream
+	url = https://github.com/glycerine/go-unsnap-stream
+[submodule "src/influxdb/src/github.com/klauspost/compress"]
+	path = src/influxdb/src/github.com/klauspost/compress
+	url = https://github.com/klauspost/compress
+[submodule "src/influxdb/src/github.com/opentracing/opentracing-go"]
+	path = src/influxdb/src/github.com/opentracing/opentracing-go
+	url = https://github.com/opentracing/opentracing-go
+[submodule "src/influxdb/src/go.uber.org/multierr"]
+	path = src/influxdb/src/go.uber.org/multierr
+	url = https://github.com/uber-go/multierr
+[submodule "src/influxdb/src/go.uber.org/zap"]
+	path = src/influxdb/src/go.uber.org/zap
+	url = https://github.com/uber-go/zap
+[submodule "src/influxdb/src/github.com/RoaringBitmap/roaring"]
+	path = src/influxdb/src/github.com/RoaringBitmap/roaring
+	url = https://github.com/RoaringBitmap/roaring
+[submodule "src/influxdb/src/github.com/mattn/go-isatty"]
+	path = src/influxdb/src/github.com/mattn/go-isatty
+	url = https://github.com/mattn/go-isatty
+[submodule "src/influxdb/src/golang.org/x/time"]
+	path = src/influxdb/src/golang.org/x/time
+	url = https://go.googlesource.com/time
+[submodule "src/influxdb/src/collectd.org"]
+	path = src/influxdb/src/collectd.org
+	url = https://github.com/collectd/go-collectd
+[submodule "src/influxdb/src/github.com/influxdata/yamux"]
+	path = src/influxdb/src/github.com/influxdata/yamux
+	url = https://github.com/influxdata/yamux
+[submodule "src/influxdb/src/github.com/klauspost/cpuid"]
+	path = src/influxdb/src/github.com/klauspost/cpuid
+	url = https://github.com/klauspost/cpuid
+[submodule "src/influxdb/src/github.com/klauspost/pgzip"]
+	path = src/influxdb/src/github.com/klauspost/pgzip
+	url = https://github.com/klauspost/pgzip
+[submodule "src/influxdb/src/go.uber.org/atomic"]
+	path = src/influxdb/src/go.uber.org/atomic
+	url = https://github.com/uber-go/atomic
+[submodule "src/influxdb/src/github.com/tinylib/msgp"]
+	path = src/influxdb/src/github.com/tinylib/msgp
+	url = https://github.com/tinylib/msgp
+[submodule "src/influxdb/src/github.com/xlab/treeprint"]
+	path = src/influxdb/src/github.com/xlab/treeprint
+	url = https://github.com/xlab/treeprint
+[submodule "src/influxdb/src/github.com/beorn7/perks"]
+	path = src/influxdb/src/github.com/beorn7/perks
+	url = https://github.com/beorn7/perks
+[submodule "src/influxdb/src/github.com/dgrijalva/jwt-go"]
+	path = src/influxdb/src/github.com/dgrijalva/jwt-go
+	url = https://github.com/dgrijalva/jwt-go
+[submodule "src/influxdb/src/github.com/philhofer/fwd"]
+	path = src/influxdb/src/github.com/philhofer/fwd
+	url = https://github.com/philhofer/fwd
+[submodule "src/influxdb/src/github.com/prometheus/client_model"]
+	path = src/influxdb/src/github.com/prometheus/client_model
+	url = https://github.com/prometheus/client_model
+[submodule "src/influxdb/src/github.com/golang/protobuf"]
+	path = src/influxdb/src/github.com/golang/protobuf
+	url = https://github.com/golang/protobuf
+[submodule "src/influxdb/src/github.com/influxdata/yarpc"]
+	path = src/influxdb/src/github.com/influxdata/yarpc
+	url = https://github.com/influxdata/yarpc
+[submodule "src/influxdb/src/github.com/influxdata/influxql"]
+	path = src/influxdb/src/github.com/influxdata/influxql
+	url = https://github.com/influxdata/influxql
+[submodule "src/influxdb/src/github.com/jsternberg/zap-logfmt"]
+	path = src/influxdb/src/github.com/jsternberg/zap-logfmt
+	url = https://github.com/jsternberg/zap-logfmt
+[submodule "src/influxdb/src/github.com/matttproud/golang_protobuf_extensions"]
+	path = src/influxdb/src/github.com/matttproud/golang_protobuf_extensions
+	url = https://github.com/matttproud/golang_protobuf_extensions
+[submodule "src/influxdb/src/golang.org/x/sync"]
+	path = src/influxdb/src/golang.org/x/sync
+	url = https://go.googlesource.com/sync
+[submodule "src/influxdb/src/github.com/cespare/xxhash"]
+	path = src/influxdb/src/github.com/cespare/xxhash
+	url = https://github.com/cespare/xxhash
+[submodule "src/influxdb/src/github.com/klauspost/crc32"]
+	path = src/influxdb/src/github.com/klauspost/crc32
+	url = https://github.com/klauspost/crc32
+[submodule "src/influxdb/src/github.com/prometheus/client_golang"]
+	path = src/influxdb/src/github.com/prometheus/client_golang
+	url = https://github.com/prometheus/client_golang
+[submodule "src/influxdb/src/github.com/prometheus/common"]
+	path = src/influxdb/src/github.com/prometheus/common
+	url = https://github.com/prometheus/common
+[submodule "src/influxdb/src/github.com/prometheus/procfs"]
+	path = src/influxdb/src/github.com/prometheus/procfs
+	url = https://github.com/prometheus/procfs
+[submodule "src/influxdb/src/golang.org/x/net"]
+	path = src/influxdb/src/golang.org/x/net
+	url = https://go.googlesource.com/net
+[submodule "src/influxdb/src/golang.org/x/text"]
+	path = src/influxdb/src/golang.org/x/text
+    url = https://go.googlesource.com/text
+[submodule "src/influxdb/src/github.com/armon/go-metrics"]
+    path = src/influxdb/src/github.com/armon/go-metrics
+    url = https://github.com/armon/go-metrics
+[submodule "src/influxdb/src/github.com/boltdb/bolt"]
+    path = src/influxdb/src/github.com/boltdb/bolt
+    url = https://github.com/boltdb/bolt
+[submodule "src/influxdb/src/github.com/davecgh/go-spew"]
+    path = src/influxdb/src/github.com/davecgh/go-spew
+    url = https://github.com/davecgh/go-spew
+[submodule "src/influxdb/src/github.com/dgryski/go-bits"]
+    path = src/influxdb/src/github.com/dgryski/go-bits
+    url = https://github.com/dgryski/go-bits
+[submodule "src/influxdb/src/github.com/google/go-cmp"]
+    path = src/influxdb/src/github.com/google/go-cmp
+    url = https://github.com/google/go-cmp
+[submodule "src/influxdb/src/github.com/hashicorp/go-msgpack"]
+    path = src/influxdb/src/github.com/hashicorp/go-msgpack
+    url = https://github.com/hashicorp/go-msgpack
+[submodule "src/influxdb/src/github.com/hashicorp/raft"]
+    path = src/influxdb/src/github.com/hashicorp/raft
+    url = https://github.com/hashicorp/raft
+[submodule "src/influxdb/src/github.com/hashicorp/raft-boltdb"]
+    path = src/influxdb/src/github.com/hashicorp/raft-boltdb
+    url = https://github.com/hashicorp/raft-boltdb
+[submodule "src/influxdb/src/github.com/kimor79/gollectd"]
+    path = src/influxdb/src/github.com/kimor79/gollectd
+    url = https://github.com/kimor79/gollectd
+[submodule "src/influxdb/src/github.com/mschoch/smat"]
+    path = src/influxdb/src/github.com/mschoch/smat
+    url = https://github.com/mschoch/smat
+[submodule "src/influxdb/src/github.com/paulbellamy/ratecounter"]
+    path = src/influxdb/src/github.com/paulbellamy/ratecounter
+    url = https://github.com/paulbellamy/ratecounter
+[submodule "src/influxdb/src/github.com/rakyll/statik"]
+    path = src/influxdb/src/github.com/rakyll/statik
+    url = https://github.com/rakyll/statik
+[submodule "src/influxdb/src/github.com/retailnext/hllpp"]
+    path = src/influxdb/src/github.com/retailnext/hllpp
+    url = https://github.com/retailnext/hllpp
+[submodule "src/influxdb/src/github.com/willf/bitset"]
+    path = src/influxdb/src/github.com/willf/bitset
+    url = https://github.com/willf/bitset
+[submodule "src/influxdb/src/golang.org/x/tools"]
+    path = src/influxdb/src/golang.org/x/tools
+    url = https://golang.org/x/tools

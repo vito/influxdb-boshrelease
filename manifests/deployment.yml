@@ -1,0 +1,34 @@
+name: ((deployment_name))
+releases:
+  - name: influxdb
+    version: latest
+instance_groups:
+- name: influxdb
+  lifecycle: service
+  stemcell: default
+  azs:
+  - z1
+  instances: 1
+  vm_type: small
+  update:
+    serial: false
+  networks:
+  - name: default
+    static_ips: ((influxdb_static_ips))
+  jobs:
+  - name: influxdb
+    release: influxdb
+    properties:
+      influxdb:
+        static_ips: ((influxdb_static_ips))
+        database: ((db_name))
+update:
+  canaries: 1
+  canary_watch_time: 30000-1200000
+  max_in_flight: 1
+  serial: false
+  update_watch_time: 5000-1200000
+stemcells:
+- alias: default
+  os: ubuntu-xenial
+  version: latest
